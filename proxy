@@ -1,0 +1,21 @@
+import os
+import requests
+from flask import Flask, request
+
+app = Flask(__name__)
+
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
+
+@app.route("/v1/chat/completions", methods=["POST"])
+def proxy():
+    data = request.json
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    response = requests.post(DEEPSEEK_API_URL, headers=headers, json=data)
+    return (response.text, response.status_code, response.headers.items())
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
